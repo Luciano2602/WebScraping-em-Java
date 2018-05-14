@@ -1,4 +1,4 @@
-package br.pro.grupo.pi.webscraping;
+﻿package br.pro.grupo.pi.webscraping;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,7 +61,7 @@ public class Program {
                 pagina = Jsoup.connect(urlFuncionario).userAgent("Mozila/5.0").get();
                 Elements func = pagina.select("tr");
                 for(Element funcionario : func){
-                    //pegar o html
+                    //pegar o html na url
                 }
                 //Panssando os para a class responsavel por transformar em JSON
                 mapper.writeValueAsString(ubs);
