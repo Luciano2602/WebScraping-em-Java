@@ -51,9 +51,18 @@ public class Program {
                 //pegando o nome da UBS
                 String nome = item.select("a").text();
                 
+                String razao = "";
+                String codUnidade = item.select("a").attr("abs:href");;
                 //criando uma UBS
-                Ubs ubs = new Ubs(codCNES, nome);
+                Ubs ubs = new Ubs(codCNES, nome, razao, codUnidade);
                 
+                //unidade podemos pegar o cód que está dentro do href e passar no parametro pela url 
+                String urlFuncionario = "http://cnes2.datasus.gov.br/Mod_Profissional.asp?VCo_Unidade=" + codUnidade;
+                pagina = Jsoup.connect(urlFuncionario).userAgent("Mozila/5.0").get();
+                Elements func = pagina.select("tr");
+                for(Element funcionario : func){
+                    //pegar o html
+                }
                 //Panssando os para a class responsavel por transformar em JSON
                 mapper.writeValueAsString(ubs);
                 String json = mapper.writeValueAsString(ubs);
