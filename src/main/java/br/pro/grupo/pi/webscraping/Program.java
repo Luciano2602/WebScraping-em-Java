@@ -1,14 +1,20 @@
-﻿package br.pro.grupo.pi.webscraping;
-
+package br.pro.grupo.pi.webscraping;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
+import com.sun.webkit.WebPageClient;
 import java.io.IOException;
+import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,6 +23,69 @@ import org.jsoup.select.Elements;
 public class Program {
     
     public static void main(String[] args) throws IOException {
+        System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog","fatal");       
+        
+        WebClient webClient = new WebClient(BrowserVersion.CHROME);
+        webClient.getOptions().setJavaScriptEnabled(true);
+        HtmlPage page = webClient.getPage("http://cnes2.datasus.gov.br/Listar_Mantidas.asp?VCnpj=46392130000380");
+        System.out.println(page.asText() + "-" );
+        
+        System.out.println("===================================================");
+        
+        List<HtmlAnchor> ancors = page.getAnchors();
+        
+        for (HtmlAnchor linkMantidas : ancors) {
+            
+            String linkText = linkMantidas.asText();
+            
+            if (linkText.startsWith("PREFEITURA")) {
+                continue;
+            }
+            
+            System.out.println("Clicando em => " + linkText);
+            
+            
+            HtmlPage pageMantida = linkMantidas.click();
+            
+            System.out.println("Paginas Matidas => " + pageMantida.asText());
+            
+            List<HtmlAnchor> botoesMantida = pageMantida.getAnchors();
+            System.out.println("Modulos => " + botoesMantida.size());
+            
+            System.out.println("");
+            System.out.println("");
+            System.out.println("");
+            //break;
+            for (HtmlAnchor botao : botoesMantida) {
+                
+                System.out.println(" botao Mantidas => " + botao.asText());
+                HtmlAnchor linkProfissionais = pageMantida.getAnchorByHref("Mod_Profissional");
+                System.out.println("Link Profissionais => " + linkProfissionais);
+                
+                HtmlPage pageProfissionais = linkProfissionais.click();
+                System.out.println("Pagina Prof => " + pageProfissionais.asText());
+                List<DomElement> trs = pageProfissionais.getElementsByName("tr");
+                
+                for (DomElement tr : trs) {
+                    
+                    System.out.println("tr Prof => " + tr.asText());
+                }
+            }
+            
+        }
+        
+        
+        System.out.println("ACABOU");
+        
+        
+        
+        
+        
+        
+        
+        
+        /*
+        
         //as linhas abaixos instancia a class para trabalharmos com JSON
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -77,8 +146,22 @@ public class Program {
         }
         
         System.out.println("<<<<<<<<<<<<<<<<Acabou>>>>>>>>>>>>>>>>");
-               
+        
+            
+            
+            
+            */
+        
+        
+        
+        
+        
+        
+       
+        
+
         
     }
-        
+    
+    
 }
