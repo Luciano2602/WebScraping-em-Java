@@ -7,6 +7,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.machinepublishers.jbrowserdriver.JBrowserDriver;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
@@ -19,10 +20,75 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.WebElement;
 
 public class Program {
     
     public static void main(String[] args) throws IOException {
+        
+        JBrowserDriver driver = new JBrowserDriver();
+
+        // carrega a página principal
+        String url = "http://cnes2.datasus.gov.br/Listar_Mantidas.asp?VCnpj=46392130000380";
+        driver.get(url);
+
+        System.out.println(" --------  URL  -----------");
+        System.out.println(driver.toString());
+        // decobre os links dos mantidos
+        List<WebElement> links = driver.findElementsByCssSelector("a");
+        for (WebElement link : links) {
+            // carrega a página de uma mantida
+            url = link.getAttribute("href");
+            driver.get(url);
+            
+            System.out.println("----    HREF    ----");
+            System.out.println(link.getText());
+            
+            // descobre os botões de módulos
+            List<WebElement> modulos = driver.findElementsByCssSelector("a");
+            for (WebElement modulo : modulos) {
+                url = modulo.getAttribute("href");
+                System.out.println(modulo.getAttribute("href"));
+                // se for o botão Profissionais
+                if (url.contains("Profissional")) {
+                    // carreaga a página de profissionais
+                    driver.get(url);
+                    System.out.println(driver.toString());
+                    boolean fim = false;
+                    do {
+                        // mostra/usa os dados
+                        WebElement dados = driver.findElementByCssSelector("table#example");
+                        System.out.println(dados.getText());
+
+                        // carrega os dados de paginação
+                        WebElement infoElem = driver.findElementById("example_info");
+                        String info = infoElem.getText();
+
+                        // verifica se fim
+                        if (info.matches("Mostrando de (\\d+) até (\\d+) de (\\2) registros")) {
+                            fim = true;
+                        } else {
+                            // "clica" no botão next
+                            WebElement next = driver.findElementByCssSelector("span.next");
+                            next.click();
+                        }
+                    } while (!fim);
+
+                    // não tirar esse break
+                    break;
+                }
+            }
+
+            // tirar esse break para processar todos os mantidos
+            break;
+        }
+
+        driver.quit();
+        
+        
+        
+        
+        /*
         System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog","fatal");       
         
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
@@ -84,7 +150,7 @@ public class Program {
         
         
         
-        /*
+        
         
         //as linhas abaixos instancia a class para trabalharmos com JSON
         ObjectMapper mapper = new ObjectMapper();
