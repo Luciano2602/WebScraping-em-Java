@@ -26,6 +26,136 @@ public class Program {
     
     public static void main(String[] args) throws IOException {
         
+      /*
+        
+        //as linhas abaixos instancia a class para trabalharmos com JSON
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        
+        //criando uma instancia do banco
+        MongoClient mongo = new MongoClient("localhost",27017);
+        //Passando o DB
+        DB db = mongo.getDB("Luciano");
+        
+        //a linha abaixo pega a collection
+        DBCollection cnes = db.getCollection("CNES_NOVO1");
+        
+        System.out.println("Antes da url");
+        System.out.println("");
+        //site onde vamos estrair as informacoes        
+        String site = "http://cnes2.datasus.gov.br/Listar_Mantidas.asp?VCnpj=46392130000380";
+        //pegando o html da página
+        Document pagina = Jsoup.connect(site).userAgent("Mozila/5.0").get();
+        
+        //pegando o elemento da tag
+        Elements itens = pagina.select("tr");
+          
+        //a partir da linha 16 que consigo pegar os itens
+        int i = 0;
+        
+        System.out.println("Apos a url");
+        System.out.println("");
+        //percorrendo o objeto obitido atravez da tag
+        for(Element item : itens){
+            i++;
+            if(i>16 && i <= 1052){
+                //pegando o cod do CNES
+                String codCNES = item.select("font").text().substring(0, 7);            
+                //pegando o nome da UBS
+                String nome = item.select("a").text();
+                
+                String razao = "";
+                String codUnidade = item.select("a").attr("abs:href").replace("http://cnes2.datasus.gov.br/Exibe_Ficha_Estabelecimento.asp?VCo_Unidade=", "");
+                
+              
+                //criando uma UBS
+                Ubs ubs = new Ubs(codCNES, nome, razao, codUnidade);
+                
+                */
+                //unidade podemos pegar o cód que está dentro do href e passar no parametro pela url 
+                String urlFuncionario = "http://cnes2.datasus.gov.br/Mod_Profissional.asp?VCo_Unidade=3550305713870";// + codUnidade;
+                Document pagina = Jsoup.connect(urlFuncionario).userAgent("Mozila/5.0").get();
+                Elements itens = pagina.select("tbody tr");
+                
+                //WebClient webClient = new WebClient(BrowserVersion.CHROME);
+                //webClient.getOptions().setJavaScriptEnabled(true);
+                //HtmlPage page = webClient.getPage(urlFuncionario);
+                                               
+                //System.out.println(page.asText());
+                //List<HtmlAnchor> ancor = page.getAnchors();
+                
+                System.out.println(itens.text());                
+                System.out.println();                
+                System.out.println();                
+                System.out.println();                
+                int i = 0;
+                String var = "";
+                for(Element item : itens){
+                    
+                    if(i >= 8){
+                        System.out.println("-> " instanceof + item.select("a").text());
+                        System.out.println("-> " instanceof + item.select("font").text());
+                        List<Element> ls = item.select("font");
+                        
+                    }
+                    //System.out.println("-> " + item.text());
+                    //System.out.println("-> " + i);
+                    //System.out.println(item.select("tr").text());
+                    //if (i == 5) {
+                      //  var = item.select("tr").text().replace("Ativo", "Ativo;");
+                    //}
+                    i++;
+                }
+                
+                
+                System.out.println("");
+                System.out.println("");
+                System.out.println("");
+                System.out.println("var");
+                System.out.println(var);
+                //int tamanhoVetor = var.length();
+                String v[] = new String[var.split(";").length];
+                
+                v = var.split(";");
+                
+                for (int j = 0; j < v.length; j++) {
+                    System.out.println(v[j]);
+                }
+                
+                //break; vamos excluir
+                //pagina = Jsoup.connect(urlFuncionario).userAgent("Mozila/5.0").get();
+                //Elements func = pagina.select("tr");
+                //for(Element funcionario : func){
+                    //pegar o html na url
+                //}
+                // fim da exclusao
+                
+                //Panssando os para a class responsavel por transformar em JSON
+                //mapper.writeValueAsString(ubs);
+                //String json = mapper.writeValueAsString(ubs);
+                //System.out.println(json);
+                //System.out.println("-> " + i);
+                //persistindo no banco 
+                //DBObject obj = (DBObject) JSON.parse(json);
+                //cnes.insert(obj);
+            }
+            
+        
+        }
+        
+       
+        
+        
+        
+      
+        
+        
+        
+        
+        /*
+        
         JBrowserDriver driver = new JBrowserDriver();
 
         // carrega a página principal
@@ -80,7 +210,7 @@ public class Program {
             }
 
             // tirar esse break para processar todos os mantidos
-            break;
+           // break;
         }
 
         driver.quit();
@@ -88,7 +218,7 @@ public class Program {
         
         
         
-        /*
+        
         System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog","fatal");       
         
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
@@ -130,6 +260,7 @@ public class Program {
                 
                 HtmlPage pageProfissionais = linkProfissionais.click();
                 System.out.println("Pagina Prof => " + pageProfissionais.asText());
+        
                 List<DomElement> trs = pageProfissionais.getElementsByName("tr");
                 
                 for (DomElement tr : trs) {
@@ -146,88 +277,8 @@ public class Program {
         
         
         
-        
-        
-        
-        
-        
-        
-        //as linhas abaixos instancia a class para trabalharmos com JSON
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        
-        //criando uma instancia do banco
-        MongoClient mongo = new MongoClient("localhost",27017);
-        //Passando o DB
-        DB db = mongo.getDB("Luciano");
-        
-        //a linha abaixo pega a collection
-        DBCollection cnes = db.getCollection("CNES");
-        
-        //site onde vamos estrair as informacoes        
-        String site = "http://cnes2.datasus.gov.br/Listar_Mantidas.asp?VCnpj=46392130000380";
-        //pegando o html da página
-        Document pagina = Jsoup.connect(site).userAgent("Mozila/5.0").get();
-        
-        //pegando o elemento da tag
-        Elements itens = pagina.select("tr");
-          
-        //a partir da linha 16 que consigo pegar os itens
-        int i = 0;
-        
-        //percorrendo o objeto obitido atravez da tag
-        for(Element item : itens){
-            i++;
-            if(i>16){
-                //pegando o cod do CNES
-                String codCNES = item.select("font").text().substring(0, 7);            
-                //pegando o nome da UBS
-                String nome = item.select("a").text();
-                
-                String razao = "";
-                String codUnidade = item.select("a").attr("abs:href");;
-                //criando uma UBS
-                Ubs ubs = new Ubs(codCNES, nome, razao, codUnidade);
-                
-                //unidade podemos pegar o cód que está dentro do href e passar no parametro pela url 
-                String urlFuncionario = "http://cnes2.datasus.gov.br/Mod_Profissional.asp?VCo_Unidade=" + codUnidade;
-                pagina = Jsoup.connect(urlFuncionario).userAgent("Mozila/5.0").get();
-                Elements func = pagina.select("tr");
-                for(Element funcionario : func){
-                    //pegar o html na url
-                }
-                //Panssando os para a class responsavel por transformar em JSON
-                mapper.writeValueAsString(ubs);
-                String json = mapper.writeValueAsString(ubs);
-                System.out.println(json);
-            
-                //persistindo no banco 
-                DBObject obj = (DBObject) JSON.parse(json);
-                cnes.insert(obj);
-            }
-            
-        
-        }
-        
-        System.out.println("<<<<<<<<<<<<<<<<Acabou>>>>>>>>>>>>>>>>");
-        
-            
-            
-            
-            */
-        
-        
-        
-        
-        
-        
-       
-        
-
-        
     }
     
     
 }
+*/
